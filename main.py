@@ -11,7 +11,7 @@ app.config['MONGO_URI'] = "mongodb://localhost:27017/data"
 mongo = PyMongo(app)
 
 
-@app.route('/add',methods=['POST'])
+@app.route('/add-emp',methods=['POST'])
 def add():
     name = request.json['name']
     pwd = request.json['pass']
@@ -32,18 +32,32 @@ def not_found(error=None):
     resp = jsonify(message)
     return resp
 
-@app.route('/employee',methods=['GET'])
+@app.route('/all-emp',methods=['GET'])
 def show():
     users = mongo.db.emp.find()
     resp = dumps(users)
     return resp
 
 
-@app.route('/emp/<id>',methods=['GET'])
+@app.route('/show-emp/<id>',methods=['GET'])
 def show_one(id):
     users = mongo.db.emp.find_one({'_id':ObjectId(id)})
     resp = dumps(users)
     return resp
+
+@app.route('/dlt-emp/<id>',methods=['DELETE'])
+def dlt_one(id):
+    mongo.db.emp.delete_one({'_id':ObjectId(id)})
+    resp = "User deleted Succesfully"
+    return jsonify(resp)
+
+@app.route('/update-emp/<id>',methods=['PUT'])
+def update(id):
+    name = request.json['name']
+    pwd = request.json['pass']
+    mongo.db.emp.update_one({'_id':ObjectId(id)},{'$set':{'name':name,'pass':pwd}})
+    resp = "User updated Succesfully"
+    return jsonify(resp)
 
 if __name__ == "__main__":
     app.run()
